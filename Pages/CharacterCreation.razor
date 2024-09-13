@@ -1,0 +1,60 @@
+﻿@page "/character-creation"
+
+<h3>Create Your Character</h3>
+
+<label>Name: </label>
+<input @bind="character.Name" placeholder="Enter character name" />
+
+<h4>Roll Stats:</h4>
+<button @onclick="RollStats">Roll Stats</button>
+<ul>
+    <li>Strength: @character.Strength</li>
+    <li>Dexterity: @character.Dexterity</li>
+    <li>Constitution: @character.Constitution</li>
+    <li>Intelligence: @character.Intelligence</li>
+    <li>Wisdom: @character.Wisdom</li>
+    <li>Charisma: @character.Charisma</li>
+</ul>
+
+<h4>Select Race:</h4>
+@foreach (var race in races)
+{
+    <div>
+        <input type="radio" @bind="character.Race" value="@race.Name" />
+        @race.Name (@race.Description)
+    </div>
+}
+
+<h4>Select Class:</h4>
+@foreach (var characterClass in classes)
+{
+    <div>
+        <input type="radio" @bind="character.Class" value="@characterClass.Name" />
+        @characterClass.Name (@characterClass.Description)
+    </div>
+}
+
+<button @onclick="SaveCharacter">Save Character</button>
+
+@code {
+    private Character character = new Character();
+    private List<Race> races = new List<Race> { new Pentarexian(), new Narpaca() };
+    private List<CharacterClass> classes = new List<CharacterClass> { new Arquebusier(), new Shocktrooper() };
+
+    private void RollStats()
+    {
+        Random random = new Random();
+        character.Strength = random.Next(3, 18);
+        character.Dexterity = random.Next(3, 18);
+        character.Constitution = random.Next(3, 18);
+        character.Intelligence = random.Next(3, 18);
+        character.Wisdom = random.Next(3, 18);
+        character.Charisma = random.Next(3, 18);
+    }
+
+    private void SaveCharacter()
+    {
+        // Logic to save the character, possibly to a file or a database.
+        Console.WriteLine("Character Saved!");
+    }
+}
