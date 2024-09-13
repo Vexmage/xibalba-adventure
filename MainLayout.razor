@@ -1,5 +1,22 @@
 ﻿@inherits LayoutComponentBase
 
-<main>
-    @Body
-</main>
+<div class="main-layout">
+    <!-- Navigation Bar -->
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/character-creation">Character Creation</a></li>
+            <li><a href="/settings">Settings</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main>
+        @Body
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Xibalba Adventure</p>
+    </footer>
+</div>

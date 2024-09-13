@@ -1,4 +1,6 @@
 ﻿@page "/character-creation"
+@using XibalbaAdventure.Models
+
 
 <h3>Create Your Character</h3>
 
@@ -20,7 +22,7 @@
 @foreach (var race in races)
 {
     <div>
-        <input type="radio" @bind="character.Race" value="@race.Name" />
+        <input type="radio" @bind="character.Race" />  <!-- Removed value attribute -->
         @race.Name (@race.Description)
     </div>
 }
@@ -29,7 +31,7 @@
 @foreach (var characterClass in classes)
 {
     <div>
-        <input type="radio" @bind="character.Class" value="@characterClass.Name" />
+        <input type="radio" @bind="character.CharacterClass" />  <!-- Removed value attribute -->
         @characterClass.Name (@characterClass.Description)
     </div>
 }
