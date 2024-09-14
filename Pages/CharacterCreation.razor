@@ -17,7 +17,7 @@
 </ul>
 
 <h4>Select Race:</h4>
-<select @bind="selectedRaceName">
+<select @onchange="UpdateRace">
     <option value="">Select Race</option>
     @foreach (var race in races)
     {
@@ -26,7 +26,7 @@
 </select>
 
 <h4>Select Class:</h4>
-<select @bind="selectedClassName">
+<select @onchange="UpdateClass">
     <option value="">Select Class</option>
     @foreach (var characterClass in classes)
     {
@@ -34,16 +34,37 @@
     }
 </select>
 
+@if (selectedRace != null && selectedClass != null)
+{
+    <h4>Updated Character Sheet:</h4>
+    <ul>
+        <li>Kinetic (with modifiers): @modifiedKinetic</li>
+        <li>Concentration (with modifiers): @modifiedConcentration</li>
+        <li>Stoic (with modifiers): @modifiedStoic</li>
+        <li>Social (with modifiers): @modifiedSocial</li>
+        <li>Perception (with modifiers): @modifiedPerception</li>
+        <li>Health: @character.Health</li>
+        <li>Mana: @character.Mana</li>
+    </ul>
+}
+
 <button @onclick="SaveCharacter">Save Character</button>
 
 @code {
-    private Character character = new Character(); // Create a new character
-    private string selectedRaceName;
-    private string selectedClassName;
+    private Character character = new Character();  // Use the default constructor
 
-    // Dummy data for races and classes
     private List<Race> races = new List<Race> { new Pentarexian(), new Narpaca() };
     private List<CharacterClass> classes = new List<CharacterClass> { new Arquebusier(), new Shocktrooper() };
+
+    private Race selectedRace;
+    private CharacterClass selectedClass;
+
+    // Modified stats
+    private int modifiedKinetic;
+    private int modifiedConcentration;
+    private int modifiedStoic;
+    private int modifiedSocial;
+    private int modifiedPerception;
 
     private void RollStats()
     {
@@ -53,20 +74,41 @@
         character.Stoic = random.Next(3, 18);
         character.Social = random.Next(3, 18);
         character.Perception = random.Next(3, 18);
+        UpdateModifiers(); // Ensure modifiers update with the rolled stats
+    }
+
+    private void UpdateRace(ChangeEventArgs e)
+    {
+        var raceName = e.Value?.ToString();
+        selectedRace = races.FirstOrDefault(r => r.Name == raceName);
+        UpdateModifiers();
+    }
+
+    private void UpdateClass(ChangeEventArgs e)
+    {
+        var className = e.Value?.ToString();
+        selectedClass = classes.FirstOrDefault(c => c.Name == className);
+        UpdateModifiers();
+    }
+
+    private void UpdateModifiers()
+    {
+        if (selectedRace != null && selectedClass != null)
+        {
+            modifiedKinetic = character.Kinetic + selectedRace.KineticModifier;
+            modifiedConcentration = character.Concentration + selectedRace.ConcentrationModifier;
+            modifiedStoic = character.Stoic + selectedRace.StoicModifier;
+            modifiedSocial = character.Social + selectedRace.SocialModifier;
+            modifiedPerception = character.Perception + selectedRace.PerceptionModifier;
+
+            // Update health and mana based on the selected class
+            character.Health = selectedClass.HealthBonus;
+            character.Mana = selectedClass.ManaBonus;
+        }
     }
 
     private void SaveCharacter()
     {
-        character.Race = races.FirstOrDefault(r => r.Name == selectedRaceName);
-        character.CharacterClass = classes.FirstOrDefault(c => c.Name == selectedClassName);
-
-        if (character.Race != null && character.CharacterClass != null)
-        {
-            Console.WriteLine($"Character {character.Name} with race {character.Race.Name} and class {character.CharacterClass.Name} saved!");
-        }
-        else
-        {
-            Console.WriteLine("Please select a valid race and class for the character.");
-        }
+        Console.WriteLine($"Character {character.Name} saved!");
     }
 }
