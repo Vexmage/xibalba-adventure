@@ -1,5 +1,7 @@
 ﻿@page "/character-creation"
 @using XibalbaAdventure.Models
+@using System.Text.Json
+@inject IJSRuntime JS
 
 <h3>Create Your Character</h3>
 
@@ -17,8 +19,7 @@
 </ul>
 
 <h4>Select Race:</h4>
-<select @onchange="UpdateRace">
-    <option value="">Select Race</option>
+<select @onchange="OnRaceChange">
     @foreach (var race in races)
     {
         <option value="@race.Name">@race.Name (@race.Description)</option>
@@ -26,45 +27,19 @@
 </select>
 
 <h4>Select Class:</h4>
-<select @onchange="UpdateClass">
-    <option value="">Select Class</option>
+<select @onchange="OnClassChange">
     @foreach (var characterClass in classes)
     {
         <option value="@characterClass.Name">@characterClass.Name (@characterClass.Description)</option>
     }
 </select>
 
-@if (selectedRace != null && selectedClass != null)
-{
-    <h4>Updated Character Sheet:</h4>
-    <ul>
-        <li>Kinetic (with modifiers): @modifiedKinetic</li>
-        <li>Concentration (with modifiers): @modifiedConcentration</li>
-        <li>Stoic (with modifiers): @modifiedStoic</li>
-        <li>Social (with modifiers): @modifiedSocial</li>
-        <li>Perception (with modifiers): @modifiedPerception</li>
-        <li>Health: @character.Health</li>
-        <li>Mana: @character.Mana</li>
-    </ul>
-}
-
 <button @onclick="SaveCharacter">Save Character</button>
 
 @code {
     private Character character = new Character();  // Use the default constructor
-
     private List<Race> races = new List<Race> { new Pentarexian(), new Narpaca() };
     private List<CharacterClass> classes = new List<CharacterClass> { new Arquebusier(), new Shocktrooper() };
-
-    private Race selectedRace;
-    private CharacterClass selectedClass;
-
-    // Modified stats
-    private int modifiedKinetic;
-    private int modifiedConcentration;
-    private int modifiedStoic;
-    private int modifiedSocial;
-    private int modifiedPerception;
 
     private void RollStats()
     {
@@ -74,41 +49,29 @@
         character.Stoic = random.Next(3, 18);
         character.Social = random.Next(3, 18);
         character.Perception = random.Next(3, 18);
-        UpdateModifiers(); // Ensure modifiers update with the rolled stats
     }
 
-    private void UpdateRace(ChangeEventArgs e)
+    private void OnRaceChange(ChangeEventArgs e)
     {
-        var raceName = e.Value?.ToString();
-        selectedRace = races.FirstOrDefault(r => r.Name == raceName);
-        UpdateModifiers();
-    }
-
-    private void UpdateClass(ChangeEventArgs e)
-    {
-        var className = e.Value?.ToString();
-        selectedClass = classes.FirstOrDefault(c => c.Name == className);
-        UpdateModifiers();
-    }
-
-    private void UpdateModifiers()
-    {
-        if (selectedRace != null && selectedClass != null)
+        var selectedRace = races.FirstOrDefault(r => r.Name == e.Value.ToString());
+        if (selectedRace != null)
         {
-            modifiedKinetic = character.Kinetic + selectedRace.KineticModifier;
-            modifiedConcentration = character.Concentration + selectedRace.ConcentrationModifier;
-            modifiedStoic = character.Stoic + selectedRace.StoicModifier;
-            modifiedSocial = character.Social + selectedRace.SocialModifier;
-            modifiedPerception = character.Perception + selectedRace.PerceptionModifier;
-
-            // Update health and mana based on the selected class
-            character.Health = selectedClass.HealthBonus;
-            character.Mana = selectedClass.ManaBonus;
+            character.Race = selectedRace;
         }
     }
 
-    private void SaveCharacter()
+    private void OnClassChange(ChangeEventArgs e)
     {
-        Console.WriteLine($"Character {character.Name} saved!");
+        var selectedClass = classes.FirstOrDefault(c => c.Name == e.Value.ToString());
+        if (selectedClass != null)
+        {
+            character.CharacterClass = selectedClass;
+        }
+    }
+
+    private async Task SaveCharacter()
+    {
+        var json = JsonSerializer.Serialize(character); // Serialize the character
+        await JS.InvokeVoidAsync("downloadCharacterJson", json, character.Name + ".json");  // Use JS to download the file
     }
 }
