@@ -1,16 +1,13 @@
-﻿
-
-namespace XibalbaAdventure.Models
+﻿namespace XibalbaAdventure.Models
 {
     public class Character
     {
         public string Name { get; set; }
-        public int Strength { get; set; }
-        public int Dexterity { get; set; }
-        public int Constitution { get; set; }
-        public int Intelligence { get; set; }
-        public int Wisdom { get; set; }
-        public int Charisma { get; set; }
+        public int Kinetic { get; set; }
+        public int Concentration { get; set; }
+        public int Stoic { get; set; }
+        public int Social { get; set; }
+        public int Perception { get; set; }
 
         public Race Race { get; set; }
         public CharacterClass CharacterClass { get; set; }
@@ -20,45 +17,65 @@ namespace XibalbaAdventure.Models
         public int Mana { get; set; }
         public int Level { get; set; }
 
-        // Constructor
+        // Constructor with parameters
         public Character(string name, Race race, CharacterClass characterClass)
         {
             Name = name;
             Race = race;
             CharacterClass = characterClass;
 
-            // Base stats (modifiers can be applied by Race and Class)
-            Strength = 10;
-            Dexterity = 10;
-            Constitution = 10;
-            Intelligence = 10;
-            Wisdom = 10;
-            Charisma = 10;
+            // Initialize base stats
+            Kinetic = 10;
+            Concentration = 10;
+            Stoic = 10;
+            Social = 10;
+            Perception = 10;
 
-            // Set base stats based on race and class
+            // Apply race and class modifiers
             ApplyRaceModifiers();
             ApplyClassModifiers();
         }
 
-        public Character() { }
+        // Default constructor
+        public Character()
+        {
+            Name = "Default Name";
+            Race = new Pentarexian();  // Provide default race
+            CharacterClass = new Arquebusier();  // Provide default class
 
+            // Initialize base stats
+            Kinetic = 10;
+            Concentration = 10;
+            Stoic = 10;
+            Social = 10;
+            Perception = 10;
+
+            // Apply race and class modifiers
+            ApplyRaceModifiers();
+            ApplyClassModifiers();
+        }
 
         // Apply racial modifiers
         private void ApplyRaceModifiers()
         {
-            Strength += Race.StrengthModifier;
-            Dexterity += Race.DexterityModifier;
-            Constitution += Race.ConstitutionModifier;
-            Intelligence += Race.IntelligenceModifier;
-            Wisdom += Race.WisdomModifier;
-            Charisma += Race.CharismaModifier;
+            if (Race != null)
+            {
+                Kinetic += Race.KineticModifier;
+                Concentration += Race.ConcentrationModifier;
+                Stoic += Race.StoicModifier;
+                Social += Race.SocialModifier;
+                Perception += Race.PerceptionModifier;
+            }
         }
 
         // Apply class-based modifiers
         private void ApplyClassModifiers()
         {
-            Health = CharacterClass.HealthBonus;
-            Mana = CharacterClass.ManaBonus;
+            if (CharacterClass != null)
+            {
+                Health += CharacterClass.HealthBonus;
+                Mana += CharacterClass.ManaBonus;
+            }
         }
     }
 }
